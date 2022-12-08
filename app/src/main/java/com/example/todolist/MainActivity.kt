@@ -3,6 +3,7 @@ package com.example.todolist
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.todolist.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
@@ -16,16 +17,20 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
         taskViewModel = ViewModelProvider(this).get(TaskViewModel::class.java)
         binding.newTaskBtn.setOnClickListener {
-            NewTaskSheet().show(supportFragmentManager, "newTaskTag")
+            NewTaskSheet(null).show(supportFragmentManager, "newTaskTag")
         }
 
-        taskViewModel.name.observe(this){
-            binding.taskName.text= String.format("Task Name :%s", it)
-        }
+        setReclycerView()
 
-        taskViewModel.description.observe(this){
-            binding.taskDescription.text= String.format("Task Description :%s", it)
-        }
+    }
 
+    private fun setReclycerView()
+    {
+        val mainActivity = this
+        taskViewModel.taskItems.observe(this){
+            binding.todoListRecyclerView.apply {
+                layoutManager = LinearLayoutManager(applicationContext)
+            }
+        }
     }
 }

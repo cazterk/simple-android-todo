@@ -1,7 +1,7 @@
 package com.example.todolist
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
+import android.text.Editable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,7 +10,7 @@ import com.example.todolist.databinding.FragmentNewTaskSheetBinding
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
 
-class NewTaskSheet : BottomSheetDialogFragment()
+class NewTaskSheet(var taskItem: TaskItem?) : BottomSheetDialogFragment()
 {
 
     private lateinit var binding: FragmentNewTaskSheetBinding
@@ -23,6 +23,19 @@ class NewTaskSheet : BottomSheetDialogFragment()
 
         super.onCreate(savedInstanceState)
         val activity = requireActivity()
+
+        if(taskItem != null)
+        {
+            binding.taskTitle.text = "Edit Task"
+            val editable = Editable.Factory.getInstance()
+            binding.name.text = editable.newEditable(taskItem!!.name)
+            binding.description.text = editable.newEditable(taskItem!!.description)
+        }
+        else
+        {
+            binding.taskTitle.text = "New Task"
+        }
+
         taskViewModel = ViewModelProvider(activity).get(TaskViewModel::class.java)
         binding.saveBtn.setOnClickListener {
             saveAction()
@@ -43,8 +56,17 @@ class NewTaskSheet : BottomSheetDialogFragment()
 
     private fun saveAction()
     {
-        taskViewModel.name.value = binding.name.text.toString()
-        taskViewModel.description.value = binding.description.text.toString()
+        val name = binding.name.text.toString()
+        val description = binding.description.text.toString()
+        if(taskItem == null)
+        {
+           val newTask = TaskItem(name, description, null,  null,)
+            taskViewModel.addTaskItem(newTask)
+        }
+        else
+        {
+            taskViewModel.updateTaskItem(taskItem!!.id , name, description, null)
+        }
         binding.name.setText("")
         binding.description.setText("")
         dismiss()
