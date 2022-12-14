@@ -35,8 +35,8 @@ class NewTaskSheet(var taskItem: TaskItem?) : BottomSheetDialogFragment()
             val editable = Editable.Factory.getInstance()
             binding.name.text = editable.newEditable(taskItem!!.name)
             binding.description.text = editable.newEditable(taskItem!!.description)
-            if(taskItem!!.dueTime != null){
-               dueTime = taskItem!!.dueTime!!
+            if(taskItem!!.dueTime() != null){
+               dueTime = taskItem!!.dueTime()!!
                updateTimeBtnText()
             }
         }
@@ -85,15 +85,16 @@ class NewTaskSheet(var taskItem: TaskItem?) : BottomSheetDialogFragment()
     {
         val name = binding.name.text.toString()
         val description = binding.description.text.toString()
+        val dueTimeString = if(dueTime ==null )null else TaskItem.timeFormatter.format(dueTime)
         if(taskItem == null)
         {
-           val newTask = TaskItem(name, description, dueTime , null)
+           val newTask = TaskItem(name, description, dueTimeString , null)
            taskViewModel.addTaskItem(newTask)
 
         }
         else
         {
-            taskViewModel.updateTaskItem(taskItem!!.id , name, description, dueTime)
+            taskViewModel.updateTaskItem(taskItem!! )
         }
         binding.name.setText("")
         binding.description.setText("")
